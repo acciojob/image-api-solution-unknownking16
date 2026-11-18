@@ -20,30 +20,51 @@
 	<img id="processedImage">
 
 	<script>
-		const processImage = () => {
-			const file = document.getElementById('imageInput').files[0];
-			const url = 'https://api.imagga.com/v2/colors';
+		
+const processImage = () => {
+    const file = document.getElementById('imageInput').files[0];
 
-			const formData = new FormData();
-			formData.append('image', file);
+    if (!file) {
+        alert("Please select an image first!");
+        return;
+    }
 
-			fetch(url, {
-				method: 'POST',
-				body: formData,
-				headers: {
-					'Authorization': 'Basic ' + btoa('api_key:api_secret')
-				}
-			})
-				.then(response => response.json())
-				.then(data => {
-					const originalImage = document.getElementById('originalImage');
-					const processedImage = document.getElementById('processedImage');
+    const url = 'https://api.imagga.com/v2/colors';
 
-					originalImage.src = URL.createObjectURL(file);
-					processedImage.src = data.result.colors.image_colors[0].closest_palette_color_html;
-				})
-				.catch(error => console.error(error));
-		};
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Authorization': 'Basic ' + btoa('api_key:api_secret')
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("API request failed: " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const originalImage = document.getElementById('originalImage');
+        const processedImage = document.getElementById('processedImage');
+
+        // Display original image
+        originalImage.src = URL.createObjectURL(file);
+
+        // Display dominant color returned by API
+        const color = data.result.colors.image_colors[0].closest_palette_color_html;
+
+        processedImage.src = `https://dummyimage.com/300x200/${color.replace('#', '')}/ffffff&text=${encodeURIComponent(color)}`;
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Something went wrong while processing the image.");
+    });
+};
+
 	</script>
 </body>
 
