@@ -50,10 +50,9 @@ const processImage = () => {
         const originalImage = document.getElementById('originalImage');
         const processedImage = document.getElementById('processedImage');
 
-        // Display original image
         originalImage.src = URL.createObjectURL(file);
 
-        // Display dominant color returned by API
+        
         const color = data.result.colors.image_colors[0].closest_palette_color_html;
 
         processedImage.src = `https://dummyimage.com/300x200/${color.replace('#', '')}/ffffff&text=${encodeURIComponent(color)}`;
